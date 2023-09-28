@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Core.Settings;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Core;
 
@@ -11,6 +12,7 @@ public static class CoreForStartup
     {
         collection.AddControllers();
         collection.AddSwaggerGen();
+        collection.AddSettings();
 
         return collection;
     }
