@@ -1,4 +1,7 @@
-﻿using Core.Settings;
+﻿using Core.Migrations;
+using Core.RepositoryBase.Connection;
+using Core.RepositoryBase.Connection.Interfaces;
+using Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Core;
@@ -14,6 +17,9 @@ public static class CoreForStartup
         collection.AddSwaggerGen();
         collection.AddSettings();
 
+        collection.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
+        collection.AddMigrationRunner();
+        
         return collection;
     }
 }
