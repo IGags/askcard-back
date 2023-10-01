@@ -1,11 +1,13 @@
 ﻿using System;
-using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Settings.Models;
 using Core.Smtp.Interfaces;
 using Microsoft.Extensions.Options;
+using MimeKit;
+using MimeKit.Text;
+using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace Core.Smtp;
 
@@ -18,28 +20,28 @@ public class SmtpSender : ISmtpSender, IDisposable
     {
         _options = options;
         var value = options.Value;
-        _client.Port = value.Port;
-        _client.Host = value.Client;
-        _client.EnableSsl = value.SslEnable;
-        var credentials = new NetworkCredential(value.SenderId, value.MailPassword);
-        _client.UseDefaultCredentials = false;
-        _client.Credentials = credentials;
+        _client.Connect(value.Client,value.Port, value.SslEnable);
+        _client.Authenticate(value.SenderId, value.MailPassword);
     }
     
     public async Task SendAsync(string toMail, string topic, string body, bool isHtml = false, Encoding bodyEncoding = null)
     {
-        bodyEncoding ??= Encoding.UTF8;
-        var message = new MailMessage(_options.Value.FromMail, toMail);
-        message.Body = body;
-        message.Subject = topic;
-        message.BodyEncoding = bodyEncoding;
-        message.IsBodyHtml = isHtml;
+        var email = new MimeMessage();
+        email.From.Add(new MailboxAddress(bodyEncoding, _options.Value.FromMail, _options.Value.FromMail));
+        email.To.Add(new MailboxAddress(bodyEncoding, toMail, toMail));
+        var textFormat = isHtml ? TextFormat.Html : TextFormat.Text;
+        email.Body = new TextPart(textFormat)
+        {
+            Text = body
+        };
+        email.Subject = topic;
         
-        _client.SendAsync(message, new object());
+        await _client.SendAsync(email);
     }
 
     public void Dispose()
     {
+        _client.Disconnect(true);
         _client?.Dispose();
     }
 }
