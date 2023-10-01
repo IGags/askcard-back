@@ -66,8 +66,10 @@ public class Repository<TDal, TKey> : IRepository<TDal, TKey> where TDal : DalMo
     }
 
     /// <inheritdoc />
-    public Task<List<TDal>> GetAllAsync(DbTransaction transaction)
+    public async Task<List<TDal>> GetAllAsync(DbTransaction transaction)
     {
-        throw new System.NotImplementedException();
+        var statement = $"SELECT * FROM {DalHelper.TbName<TDal>()}";
+        var result = await Connection.QueryAsync<TDal>(statement, transaction);
+        return result.AsList();
     }
 }

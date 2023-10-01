@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
 using Core;
+using Core.Smtp.Interfaces;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Api;

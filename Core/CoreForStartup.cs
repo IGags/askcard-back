@@ -2,6 +2,8 @@
 using Core.RepositoryBase.Connection;
 using Core.RepositoryBase.Connection.Interfaces;
 using Core.Settings;
+using Core.Smtp;
+using Core.Smtp.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Core;
@@ -18,6 +20,7 @@ public static class CoreForStartup
         collection.AddSettings();
 
         collection.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
+        collection.AddTransient<ISmtpSender, SmtpSender>();
         collection.AddMigrationRunner();
         
         return collection;

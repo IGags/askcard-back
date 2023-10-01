@@ -23,6 +23,12 @@ public static class SettingsForStartup
 
             return new OptionsWrapper<DebugSettings>(new DebugSettings(configuration));
         });
+        
+        collection.TryAddSingleton<IOptions<SmtpSettings>>(provider =>
+        {
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            return new OptionsWrapper<SmtpSettings>(new SmtpSettings(configuration));
+        });
 
         return collection;
     }
