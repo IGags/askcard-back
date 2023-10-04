@@ -11,6 +11,11 @@ namespace Core.RepositoryBase.Repository.Interfaces;
 public interface IRepository<TDal, TKey> where TDal : DalModelBase<TKey>
 {
     /// <summary>
+    /// Начало транзакции
+    /// </summary>
+    DbTransaction BeginTransaction();
+    
+    /// <summary>
     /// Вставка
     /// </summary>
     Task<TKey> InsertAsync(TDal model, DbTransaction transaction);

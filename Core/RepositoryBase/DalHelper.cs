@@ -15,15 +15,19 @@ public static class DalHelper
 
     public static string TbName<T>()
     {
-        return $"\"{nameof(T).ToLower()}\"";
+        return $"\"{typeof(T).Name.ToLower()}\"";
     }
 
     public static string ColName<T>(Expression<Func<T, object>> col, bool isAddTableName = true)
     {
-        var colName = default(string);
+        string colName;
         if (col.Body is MemberExpression exp)
         {
             colName = $"\"{exp.Member.Name}\"";
+        }
+        else if(col.Body is UnaryExpression unaryExpression)
+        {
+            colName = $"\"{((MemberExpression)unaryExpression.Operand).Member.Name}\"";
         }
         else
         {

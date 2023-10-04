@@ -4,4 +4,15 @@
         <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
 
+
+
+    <ItemGroup>
+      <Folder Include="Services\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Core\Core.csproj" />
+      <ProjectReference Include="..\Dal\Dal.csproj" />
+    </ItemGroup>
+
 </Project>

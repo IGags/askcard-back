@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Settings.Models;
@@ -7,7 +6,7 @@ using Core.Smtp.Interfaces;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
-using SmtpClient = MailKit.Net.Smtp.SmtpClient;
+using MailKit.Net.Smtp;
 
 namespace Core.Smtp;
 
@@ -26,6 +25,7 @@ public class SmtpSender : ISmtpSender, IDisposable
     
     public async Task SendAsync(string toMail, string topic, string body, bool isHtml = false, Encoding bodyEncoding = null)
     {
+        bodyEncoding ??= Encoding.UTF8;
         var email = new MimeMessage();
         email.From.Add(new MailboxAddress(bodyEncoding, _options.Value.FromMail, _options.Value.FromMail));
         email.To.Add(new MailboxAddress(bodyEncoding, toMail, toMail));

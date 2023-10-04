@@ -1,6 +1,7 @@
 ﻿using System;
 using Core;
 using Dal;
+using Logic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +18,7 @@ public class Startup
     {
         services.AddCore();
         services.AddDal();
+        services.AddLogic();
     }
 
     /// <summary>

@@ -14,13 +14,19 @@ public class Repository<TDal, TKey> : IRepository<TDal, TKey> where TDal : DalMo
 {
     private readonly IDbConnectionFactory _connectionFactory;
 
-    public DbConnection Connection => _connectionFactory.GetConnection();
+    protected DbConnection Connection => _connectionFactory.GetConnection();
     
-    public Repository(IDbConnectionFactory connectionFactory)
+    protected Repository(IDbConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
     }
     
+    /// <inheritdoc />
+    public DbTransaction BeginTransaction()
+    {
+        return Connection.BeginTransaction();
+    }
+
     /// <inheritdoc />
     public async Task<TKey> InsertAsync(TDal model, DbTransaction transaction)
     {
@@ -41,8 +47,8 @@ public class Repository<TDal, TKey> : IRepository<TDal, TKey> where TDal : DalMo
     {
         var statement =
             $"SELECT * FROM {DalHelper.TbName<TDal>()} " +
-            $"WHERE {DalHelper.ColName<TDal>(x => x.Id)} = {DalHelper.ParameterPrefix}{{nameof(id)}}";
-        var result = await Connection.QuerySingleAsync<TDal>(statement, id, transaction);
+            $"WHERE {DalHelper.ColName<TDal>(x => x.Id)} = {DalHelper.ParameterPrefix}{nameof(id)}";
+        var result = await Connection.QuerySingleAsync<TDal>(statement, new { id }, transaction);
         
         return result;
     }
@@ -53,7 +59,7 @@ public class Repository<TDal, TKey> : IRepository<TDal, TKey> where TDal : DalMo
         var statement =
             $"DELETE FROM {DalHelper.TbName<TDal>()} " +
             $"WHERE {DalHelper.ColName<TDal>(x => x.Id)} = {DalHelper.ParameterPrefix}{nameof(id)}";
-        await Connection.ExecuteAsync(statement, id, transaction);
+        await Connection.ExecuteAsync(statement, new { id }, transaction);
     }
 
     /// <inheritdoc />

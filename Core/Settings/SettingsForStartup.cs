@@ -30,6 +30,12 @@ public static class SettingsForStartup
             return new OptionsWrapper<SmtpSettings>(new SmtpSettings(configuration));
         });
 
+        collection.TryAddSingleton<IOptions<ConfirmationSettings>>(provider =>
+        {
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            return new OptionsWrapper<ConfirmationSettings>(new ConfirmationSettings(configuration));
+        });
+        
         return collection;
     }
 }

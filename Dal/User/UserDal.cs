@@ -11,10 +11,20 @@ public class UserDal : DalModelBase<Guid>
     /// <summary>
     /// Логин пользователя
     /// </summary>
-    public string Login { get; set; }
+    public required string Login { get; set; }
     
     /// <summary>
     /// Хэш пароля
     /// </summary>
-    public string PasswordHash { get; set; }
+    public required string PasswordHash { get; set; }
+    
+    /// <summary>
+    /// Мыло пользователя
+    /// </summary>
+    public required string Email { get; set; }
+    
+    /// <summary>
+    /// Согласен ли пользователь на рассылку
+    /// </summary>
+    public required bool IsAgree { get; set; }
 }

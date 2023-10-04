@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Migrations;
 using Dal.User;
 using FluentMigrator;
 
@@ -16,9 +17,11 @@ public class Date_202310011830_AddUserDal : Migration
         if (!Schema.Table(tbName).Exists())
         {
             Create.Table(tbName)
-                .WithColumn(nameof(UserDal.Id)).AsGuid().PrimaryKey()
+                .WithColumn(nameof(UserDal.Id)).AsPrimaryGuid()
                 .WithColumn(nameof(UserDal.Login)).AsString().NotNullable()
-                .WithColumn(nameof(UserDal.PasswordHash)).AsString().NotNullable();
+                .WithColumn(nameof(UserDal.PasswordHash)).AsString().NotNullable()
+                .WithColumn(nameof(UserDal.Email)).AsString().NotNullable()
+                .WithColumn(nameof(UserDal.IsAgree)).AsBoolean().NotNullable();
         }
     }
 
