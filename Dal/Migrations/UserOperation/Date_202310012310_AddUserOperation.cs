@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using Core.Migrations;
 using Dal.User;
 using Dal.UserOperation;
@@ -30,6 +31,6 @@ public class Date_202310012310_AddUserOperation : Migration
 
     public override void Down()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 }

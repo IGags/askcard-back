@@ -13,6 +13,6 @@ public class BaseMigration : Migration
 
     public override void Down()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 }
