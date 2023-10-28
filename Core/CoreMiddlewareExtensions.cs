@@ -13,6 +13,8 @@ public static class CoreMiddlewareExtensions
     public static IApplicationBuilder UseCore(this IApplicationBuilder app, IWebHostEnvironment env)
     {
         app.UseMiddleware<ExceptionMiddleware>();
+        app.UseAuthentication();
+        app.UseAuthorization();
         if (env.IsDevelopment())
         {
             app.UseSwagger();

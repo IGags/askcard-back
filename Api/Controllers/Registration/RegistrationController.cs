@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Api.Controllers.Registration.Dto.Request;
 using Api.Controllers.Registration.Dto.Response;
+using Dal.Constants;
 using Logic.Managers.Registration;
 using Logic.Managers.Registration.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,8 @@ public class RegistrationController : Controller
             Email = request.Email,
             IsAgree = request.IsAgree.Value,
             Login = request.Login,
-            Password = request.Password
+            Password = request.Password,
+            Role = RoleConstants.Client
         };
         var id = await _registrationManager.StartRegistration(userModel);
 

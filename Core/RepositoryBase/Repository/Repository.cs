@@ -78,4 +78,13 @@ public class Repository<TDal, TKey> : IRepository<TDal, TKey> where TDal : DalMo
         var result = await Connection.QueryAsync<TDal>(statement, transaction);
         return result.AsList();
     }
+
+    /// <inheritdoc />
+    public async Task<List<TDal>> GetByFieldAsync(string fieldName, object fieldValue, DbTransaction transaction)
+    {
+        var statement =
+            $"SELECT * FROM {DalHelper.TbName<TDal>()} WHERE \"{fieldName}\" = {DalHelper.ParameterPrefix}{nameof(fieldValue)}";
+        var result = await Connection.QueryAsync<TDal>(statement, new { fieldValue }, transaction);
+        return result.AsList();
+    }
 }

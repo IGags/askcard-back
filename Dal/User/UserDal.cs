@@ -11,7 +11,7 @@ public class UserDal : DalModelBase<Guid>
     /// <summary>
     /// Логин пользователя
     /// </summary>
-    public required string Login { get; set; }
+    public required string Name { get; set; }
     
     /// <summary>
     /// Хэш пароля
@@ -27,4 +27,9 @@ public class UserDal : DalModelBase<Guid>
     /// Согласен ли пользователь на рассылку
     /// </summary>
     public required bool IsAgree { get; set; }
+    
+    /// <summary>
+    /// Роль пользователя
+    /// </summary>
+    public required string Role { get; set; }
 }

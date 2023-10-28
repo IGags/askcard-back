@@ -12,4 +12,6 @@ public record CreateUserModel
     public required string Password { get; init; }
     
     public required bool IsAgree { get; init; }
+    
+    public required string Role { get; init; }
 }

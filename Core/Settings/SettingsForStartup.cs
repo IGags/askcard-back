@@ -36,6 +36,12 @@ public static class SettingsForStartup
             return new OptionsWrapper<ConfirmationSettings>(new ConfirmationSettings(configuration));
         });
         
+        collection.TryAddSingleton<IOptions<IdentitySettings>>(provider =>
+        {
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            return new OptionsWrapper<IdentitySettings>(new IdentitySettings(configuration));
+        });
+        
         return collection;
     }
 }

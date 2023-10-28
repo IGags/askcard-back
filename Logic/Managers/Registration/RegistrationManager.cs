@@ -15,7 +15,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Logic.Managers.Registration;
 
-public class RegistrationManager : IRegistrationManager
+internal class RegistrationManager : IRegistrationManager
 {
     private readonly IUserOperationRepository _operationRepository;
     private readonly IOptions<ConfirmationSettings> _options;
@@ -107,8 +107,9 @@ public class RegistrationManager : IRegistrationManager
         {
             Email = user.Email,
             IsAgree = user.IsAgree,
-            Login = user.Login,
-            PasswordHash = user.Password
+            Name = user.Login,
+            PasswordHash = user.Password,
+            Role = user.Role
         };
 
         await _userRepository.InsertAsync(userDal, transaction);

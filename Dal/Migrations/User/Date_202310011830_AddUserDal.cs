@@ -18,10 +18,11 @@ public class Date_202310011830_AddUserDal : Migration
         {
             Create.Table(tbName)
                 .WithColumn(nameof(UserDal.Id)).AsPrimaryGuid()
-                .WithColumn(nameof(UserDal.Login)).AsString().NotNullable()
+                .WithColumn(nameof(UserDal.Name)).AsString().NotNullable()
                 .WithColumn(nameof(UserDal.PasswordHash)).AsString().NotNullable()
-                .WithColumn(nameof(UserDal.Email)).AsString().NotNullable()
-                .WithColumn(nameof(UserDal.IsAgree)).AsBoolean().NotNullable();
+                .WithColumn(nameof(UserDal.Email)).AsString().NotNullable().Unique()
+                .WithColumn(nameof(UserDal.IsAgree)).AsBoolean().NotNullable()
+                .WithColumn(nameof(UserDal.Role)).AsString().NotNullable();
         }
     }
 

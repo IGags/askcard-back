@@ -4,6 +4,7 @@ using Dal;
 using Logic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting.Internal;
 
@@ -11,12 +12,18 @@ namespace Api;
 
 public class Startup
 {
+    private readonly IConfiguration _configuration;
+
+    public Startup(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
     /// <summary>
     /// DI
     /// </summary>
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddCore();
+        services.AddCore(_configuration);
         services.AddDal();
         services.AddLogic();
     }

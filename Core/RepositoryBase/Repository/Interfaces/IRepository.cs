@@ -39,4 +39,9 @@ public interface IRepository<TDal, TKey> where TDal : DalModelBase<TKey>
     /// Получить все
     /// </summary>
     Task<List<TDal>> GetAllAsync(DbTransaction transaction);
+
+    /// <summary>
+    /// Получить сущости по полю(равенство)
+    /// </summary>
+    Task<List<TDal>> GetByFieldAsync(string fieldName, object fieldValue, DbTransaction transaction);
 }
