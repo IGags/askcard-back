@@ -50,7 +50,7 @@ public static class CoreForStartup
             });
         });
         
-        collection.AddSettings();
+        collection.AddCoreSettings();
 
         collection.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
         collection.AddTransient<ISmtpSender, SmtpSender>();
