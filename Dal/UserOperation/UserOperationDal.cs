@@ -37,5 +37,5 @@ public class UserOperationDal : DalModelBase<Guid>
     /// <summary>
     /// Кастомные данные
     /// </summary>
-    public string CustomData { get; set; }
+    public JObject CustomData { get; set; }
 }

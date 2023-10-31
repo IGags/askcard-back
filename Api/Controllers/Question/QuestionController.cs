@@ -31,7 +31,7 @@ public class QuestionController : Controller
     {
         var dal = new QuestionDal()
         {
-            Answers = request.Answers,
+            QuestionData = request.QuestionData,
             QuestionText = request.QuestionText,
             QuestionType = request.QuestionType.Value,
             TopicId = request.TopicId.Value
@@ -53,7 +53,7 @@ public class QuestionController : Controller
     {
         var dal = new QuestionDal()
         {
-            Answers = request.Answers,
+            QuestionData = request.QuestionData,
             QuestionText = request.QuestionText,
             QuestionType = request.QuestionType.Value,
             TopicId = request.TopicId.Value,
@@ -110,7 +110,7 @@ public class QuestionController : Controller
     {
         var response = new GetQuestionResponse()
         {
-            Answers = dal.Answers,
+            QuestionData = dal.QuestionData,
             QuestionText = dal.QuestionText,
             QuestionType = dal.QuestionType,
             TopicId = dal.TopicId,

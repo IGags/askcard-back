@@ -45,7 +45,7 @@ internal class RegistrationManager : IRegistrationManager
         var operationModel = new UserOperationDal()
         {
             Code = SecretCodeGenerationHelper.GenerateCode(6),
-            CustomData = JObject.FromObject(model).ToString(),
+            CustomData = JObject.FromObject(model),
             ExpirationDate = DateTime.UtcNow + TimeSpan.FromSeconds(_options.Value.ExpirationTime),
             LeftAttempts = _options.Value.AttemptCount,
             OperationName = Constants.RegistrationOperationName,
@@ -101,7 +101,7 @@ internal class RegistrationManager : IRegistrationManager
             throw new IncorrectCodeException(dal.LeftAttempts);
         }
 
-        var user = JObject.Parse(dal.CustomData).ToObject<CreateUserModel>();
+        var user = dal.CustomData.ToObject<CreateUserModel>();
 
         var userDal = new UserDal()
         {

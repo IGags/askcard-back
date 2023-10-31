@@ -21,7 +21,7 @@ public static class CoreForStartup
     public static IServiceCollection AddCore(this IServiceCollection collection,
          IConfiguration configuration)
     {
-        collection.AddControllers();
+        collection.AddControllers().AddNewtonsoftJson();
         
         collection.AddSwaggerGen(swagger =>
         {

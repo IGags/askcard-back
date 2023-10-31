@@ -1,5 +1,7 @@
 ﻿using Logic.Managers.Authentication;
 using Logic.Managers.Authentication.Interfaces;
+using Logic.Managers.PasswordRestore;
+using Logic.Managers.PasswordRestore.Interfaces;
 using Logic.Managers.Registration;
 using Logic.Managers.Registration.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +14,7 @@ public static class LogicForStartup
     {
         collection.AddTransient<IRegistrationManager, RegistrationManager>();
         collection.AddTransient<IAuthenticationManager, AuthenticationManager>();
+        collection.AddTransient<IRestorePasswordManager, RestorePasswordManager>();
         
         return collection;
     }
