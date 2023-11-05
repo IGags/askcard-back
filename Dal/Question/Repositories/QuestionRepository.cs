@@ -19,7 +19,8 @@ public class QuestionRepository : Repository<QuestionDal, Guid>, IQuestionReposi
 
     public async Task<List<QuestionDal>> GetRandomQuestionListAsync(int count, DbTransaction transaction)
     {
-        var sql = $"SELECT * FROM ORDER BY RAND ( ) LIMIT {DalHelper.ParameterPrefix}{nameof(count)}";
+        var sql = $"SELECT * FROM {DalHelper.TbName<QuestionDal>()} ORDER BY RANDOM() LIMIT " +
+                  $"{DalHelper.ParameterPrefix}{nameof(count)}";
         var result = await Connection.QueryAsync<QuestionDal>(sql, new{ count }, transaction);
         return result.AsList();
     }

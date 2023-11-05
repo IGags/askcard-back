@@ -6,8 +6,6 @@ namespace Dal.Question.Models;
 
 public class QuestionDal : DalModelBase<Guid>
 {
-    public required string QuestionText { get; set; }
-
     public required QuestionType QuestionType { get; set; }
     
     public required JObject QuestionData { get; set; }

@@ -25,7 +25,6 @@ public class Date_202310282130_AddQuestion : Migration
         {
             Create.Table(questionTbName)
                 .WithColumn(nameof(QuestionDal.Id)).AsPrimaryGuid()
-                .WithColumn(nameof(QuestionDal.QuestionText)).AsString().NotNullable()
                 .WithColumn(nameof(QuestionDal.QuestionType)).AsString().NotNullable()
                 .WithColumn(nameof(QuestionDal.QuestionData)).AsString().Nullable()
                 .WithColumn(nameof(QuestionDal.TopicId)).AsGuid()

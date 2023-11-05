@@ -9,9 +9,6 @@ public record UpdateQuestionRequest
 {
     [Required]
     public required Guid? Id { get; init; }
-    
-    [Required]
-    public required string QuestionText { get; init; }
 
     [Required]
     public required QuestionType? QuestionType { get; init; }

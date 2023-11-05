@@ -2,7 +2,7 @@
 
 namespace Logic.Managers.ConfirmOperation.Models;
 
-public class ConfirmOperationModel<TData> where TData : class, new()
+public class ConfirmOperationModel<TData> where TData : class
 {
     public string OperationName { get; set; }
     

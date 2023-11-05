@@ -1,7 +1,12 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
+using Api.Controllers.QuestionClient.Dto.Response;
+using Core.Validation.Attributes;
+using Dal.Question.Models;
 using Dal.Question.Repositories.Interfaces;
+using Logic.Managers.Question.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers.QuestionClient;
@@ -9,16 +14,37 @@ namespace Api.Controllers.QuestionClient;
 [Route("api/v1/public/client/question")]
 public class QuestionClientController : Controller
 {
-    private readonly IQuestionRepository _repository;
+    private readonly IQuestionManager _questionManager;
 
-    public QuestionClientController(IQuestionRepository repository)
+    public QuestionClientController(IQuestionManager questionManager)
     {
-        _repository = repository;
+        _questionManager = questionManager;
     }
     
-    /*[HttpGet("{id}")]
-    public async Task<IActionResult> GetRandomQuestionListAsync([FromRoute, Required]Guid? id)
+    //TODO: атрибут валидации по числу
+    [HttpGet("list/{count}")]
+    public async Task<IActionResult> GetRandomQuestionListAsync([FromRoute, Required, MinValue(1)]int? count)
     {
-        
-    }*/
+        var dalList = await _questionManager.GetRandomQuestionsAsync(count.Value);
+        var responseList = dalList.Select(MapQuestionResponse).ToList();
+        var response = new GetQuestionListResponse()
+        {
+            QuestionList = responseList
+        };
+
+        return Ok(response);
+    }
+
+    private GetQuestionResponse MapQuestionResponse(QuestionDal questionDal)
+    {
+        var response = new GetQuestionResponse()
+        {
+            Id = questionDal.Id,
+            TopicId = questionDal.TopicId,
+            QuestionData = questionDal.QuestionData,
+            QuestionType = questionDal.QuestionType
+        };
+
+        return response;
+    }
 }

@@ -9,6 +9,8 @@ using Dal.User.Interfaces;
 using Dal.UserOperation;
 using Dal.UserOperation.Interfaces;
 using Logic.Exceptions;
+using Logic.Managers.ConfirmOperation.Interfaces;
+using Logic.Managers.ConfirmOperation.Models;
 using Logic.Managers.Registration.Interfaces;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
@@ -17,24 +19,21 @@ namespace Logic.Managers.Registration;
 
 internal class RegistrationManager : IRegistrationManager
 {
-    private readonly IUserOperationRepository _operationRepository;
-    private readonly IOptions<ConfirmationSettings> _options;
     private readonly ISmtpSender _sender;
     private readonly IUserRepository _userRepository;
+    private readonly IConfirmOperationManager _confirmOperationManager;
 
-    public RegistrationManager(IUserOperationRepository operationRepository,
-        IOptions<ConfirmationSettings> options, ISmtpSender sender,
-        IUserRepository userRepository)
+    public RegistrationManager(ISmtpSender sender,
+        IUserRepository userRepository, IConfirmOperationManager confirmOperationManager)
     {
-        _operationRepository = operationRepository;
-        _options = options;
         _sender = sender;
         _userRepository = userRepository;
+        _confirmOperationManager = confirmOperationManager;
     }
     
     public async Task<Guid> StartRegistration(CreateUserModel model)
     {
-        var transaction = _operationRepository.BeginTransaction();
+        var transaction = _userRepository.BeginTransaction();
         var isExist = await _userRepository.UserExistsByEmail(model.Email, transaction);
         if (isExist)
         {
@@ -42,78 +41,39 @@ internal class RegistrationManager : IRegistrationManager
         }
         
         model = model with { Password = PasswordHashHelper.GetPasswordHash(model.Password) };
-        var operationModel = new UserOperationDal()
+
+        var confirmModel = new ConfirmOperationModel<CreateUserModel>()
         {
-            Code = SecretCodeGenerationHelper.GenerateCode(6),
-            CustomData = JObject.FromObject(model),
-            ExpirationDate = DateTime.UtcNow + TimeSpan.FromSeconds(_options.Value.ExpirationTime),
-            LeftAttempts = _options.Value.AttemptCount,
+            CustomData = model,
             OperationName = Constants.RegistrationOperationName,
             UserId = Guid.Empty
         };
+
+        var resultModel = await _confirmOperationManager.CreateOperationAsync(confirmModel);
         
-        var id = await _operationRepository.InsertAsync(operationModel, transaction);
-        await _sender.SendAsync(model.Email, "Ваш код регистрации", operationModel.Code);
+        await _sender.SendAsync(model.Email, "Ваш код регистрации", resultModel.Code);
 
         await transaction.CommitAsync();
         
-        return id;
+        return resultModel.OperationId;
     }
 
     public async Task ConfirmRegistration(ConfirmUserModel model)
     {
-        var transaction = _operationRepository.BeginTransaction();
-        UserOperationDal dal;
-        try
-        {
-            dal = await _operationRepository.GetAsync(model.OperationId, transaction);
-        }
-        catch (Exception)
-        {
-            throw new OperationNotFoundException(model.OperationId);
-        }
-
-        if (!dal.OperationName.Equals(Constants.RegistrationOperationName))
-        {
-            await transaction.CommitAsync();
-            throw new OperationNotFoundException(model.OperationId);
-        }
-        
-        if (dal.ExpirationDate < DateTime.UtcNow)
-        {
-            await _operationRepository.DeleteAsync(model.OperationId, transaction);
-            await transaction.CommitAsync();
-            throw new OperationIsExpiredException();
-        }
-
-        if (dal.LeftAttempts <= 0)
-        {
-            await _operationRepository.DeleteAsync(model.OperationId, transaction);
-            await transaction.CommitAsync();
-            throw new IncorrectCodeException(dal.LeftAttempts);
-        }
-        
-        if (!dal.Code.Equals(model.Code))
-        {
-            dal.LeftAttempts--;
-            await _operationRepository.UpdateAsync(dal, transaction);
-            await transaction.CommitAsync();
-            throw new IncorrectCodeException(dal.LeftAttempts);
-        }
-
-        var user = dal.CustomData.ToObject<CreateUserModel>();
+        var transaction = _userRepository.BeginTransaction();
+        var userModel = await _confirmOperationManager.ConfirmOperationAsync<CreateUserModel>(model.OperationId,
+            Constants.RegistrationOperationName, model.Code);
 
         var userDal = new UserDal()
         {
-            Email = user.Email,
-            IsAgree = user.IsAgree,
-            Name = user.Login,
-            PasswordHash = user.Password,
-            Role = user.Role
+            Email = userModel.Email,
+            IsAgree = userModel.IsAgree,
+            Name = userModel.Login,
+            PasswordHash = userModel.Password,
+            Role = userModel.Role
         };
 
         await _userRepository.InsertAsync(userDal, transaction);
-        await _operationRepository.DeleteAsync(model.OperationId, transaction);
         await transaction.CommitAsync();
     }
 }

@@ -8,9 +8,6 @@ namespace Api.Controllers.Question.Dto.Request;
 public record CreateQuestionRequest
 {
     [Required]
-    public required string QuestionText { get; init; }
-
-    [Required]
     public required QuestionType? QuestionType { get; init; }
     
     [Required]
