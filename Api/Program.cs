@@ -1,3 +1,4 @@
+using System.Net;
 using System.Threading.Tasks;
 using Core;
 using Core.Smtp.Interfaces;
@@ -14,7 +15,12 @@ public class Program
     /// </summary>
     public static async Task Main(params string[] args)
     {
-        var host = Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(x => x.UseStartup<Startup>()).Build();
+        var hostBuilder = Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(x =>
+        {
+            x.UseStartup<Startup>();
+            x.ConfigureKestrel(y => y.Listen(IPAddress.Parse("26.231.63.180"), 5111));
+        });
+        var host = hostBuilder.Build();
         await host.RunOneTimeLogicAsync();
         await host.RunAsync();
     }

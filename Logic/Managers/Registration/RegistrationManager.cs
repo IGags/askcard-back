@@ -52,7 +52,7 @@ internal class RegistrationManager : IRegistrationManager
         var resultModel = await _confirmOperationManager.CreateOperationAsync(confirmModel);
         
         await _sender.SendAsync(model.Email, "Ваш код регистрации", resultModel.Code);
-
+       
         await transaction.CommitAsync();
         
         return resultModel.OperationId;
@@ -60,7 +60,6 @@ internal class RegistrationManager : IRegistrationManager
 
     public async Task ConfirmRegistration(ConfirmUserModel model)
     {
-        var transaction = _userRepository.BeginTransaction();
         var userModel = await _confirmOperationManager.ConfirmOperationAsync<CreateUserModel>(model.OperationId,
             Constants.RegistrationOperationName, model.Code);
 
@@ -73,6 +72,8 @@ internal class RegistrationManager : IRegistrationManager
             Role = userModel.Role
         };
 
+        var transaction = _userRepository.BeginTransaction();
+        
         await _userRepository.InsertAsync(userDal, transaction);
         await transaction.CommitAsync();
     }

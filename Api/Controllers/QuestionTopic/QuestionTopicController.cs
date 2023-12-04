@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Api.Controllers.QuestionTopic.Dto.Request;
 using Api.Controllers.QuestionTopic.Dto.Response;
+using Api.Controllers.QuestionTopic.Helpers;
 using Dal.Constants;
 using Dal.QuestionTopic.Models;
 using Dal.QuestionTopic.Repositories.Interfaces;
@@ -13,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers.QuestionTopic;
 
-[Route("api/v1/public/provider")]
+[Route("api/v1/public/provider/question-topic")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = RoleConstants.Provider)]
 public class QuestionTopicController : Controller
 {
@@ -77,7 +78,7 @@ public class QuestionTopicController : Controller
 
         var dal = await _repository.GetAsync(id.Value, transaction);
         await transaction.CommitAsync();
-        var response = MapGetResponse(dal);
+        var response = dal.MapGetResponse();
 
         return Ok(response);
     }
@@ -90,7 +91,7 @@ public class QuestionTopicController : Controller
         var dalList = await _repository.GetAllAsync(transaction);
         await transaction.CommitAsync();
 
-        var responseList = dalList.Select(MapGetResponse).ToList();
+        var responseList = dalList.Select(x => x.MapGetResponse()).ToList();
 
         var response = new GetTopicListResponse()
         {
@@ -98,15 +99,5 @@ public class QuestionTopicController : Controller
         };
 
         return Ok(response);
-    }
-    
-    private GetTopicResponse MapGetResponse(QuestionTopicDal dal)
-    {
-        var response = new GetTopicResponse()
-        {
-            Id = dal.Id,
-            TopicName = dal.TopicName
-        };
-        return response;
     }
 }

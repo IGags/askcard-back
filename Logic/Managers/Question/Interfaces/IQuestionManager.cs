@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dal.Question.Models;
 
@@ -9,5 +10,5 @@ namespace Logic.Managers.Question.Interfaces;
 /// </summary>
 public interface IQuestionManager
 {
-    public Task<List<QuestionDal>> GetRandomQuestionsAsync(int count);
+    public Task<List<QuestionDal>> GetRandomQuestionsAsync(int count, Guid topicId);
 }

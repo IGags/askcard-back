@@ -11,7 +11,7 @@ public class DbConnectionFactory : IDbConnectionFactory
 {
     private DbConnection _connection;
     
-    private DbSettings _dbSettings;
+    private readonly DbSettings _dbSettings;
     
     public DbConnectionFactory(IOptions<DbSettings> dbSettings)
     {
@@ -39,7 +39,7 @@ public class DbConnectionFactory : IDbConnectionFactory
         {
             GetConnection();
         }
-
+        
         return _connection.BeginTransaction();
     }
 

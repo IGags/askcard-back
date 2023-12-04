@@ -17,11 +17,13 @@ public class QuestionRepository : Repository<QuestionDal, Guid>, IQuestionReposi
     {
     }
 
-    public async Task<List<QuestionDal>> GetRandomQuestionListAsync(int count, DbTransaction transaction)
+    public async Task<List<QuestionDal>> GetRandomQuestionListAsync(int count, Guid topicId, DbTransaction transaction)
     {
-        var sql = $"SELECT * FROM {DalHelper.TbName<QuestionDal>()} ORDER BY RANDOM() LIMIT " +
+        var sql = $"SELECT * FROM {DalHelper.TbName<QuestionDal>()} " +
+                  $"WHERE {DalHelper.ColName<QuestionDal>(x => x.TopicId)}={DalHelper.ParameterPrefix}{nameof(topicId)} " +
+                  $"ORDER BY RANDOM() LIMIT " +
                   $"{DalHelper.ParameterPrefix}{nameof(count)}";
-        var result = await Connection.QueryAsync<QuestionDal>(sql, new{ count }, transaction);
+        var result = await Connection.QueryAsync<QuestionDal>(sql, new{ topicId, count }, transaction);
         return result.AsList();
     }
 }

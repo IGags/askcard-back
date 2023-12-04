@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Core.Validation.Attributes;
 
-[AttributeUsage(AttributeTargets.Parameter)]
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property, AllowMultiple = false)]
 public class MinValueAttribute : ValidationAttribute
 {
     private readonly int _minValue;
 
-    public MinValueAttribute(int minValue)
+    public MinValueAttribute(int minValue) : base("Ошибка валидации")
     {
         _minValue = minValue;
     }
@@ -19,7 +19,7 @@ public class MinValueAttribute : ValidationAttribute
         {
             return ValidationResult.Success;
         }
-
-        return new ValidationResult("Ошибка валидации");
+        
+        return new ValidationResult("Ошибка валидации", new[] { validationContext.MemberName });
     }
 }

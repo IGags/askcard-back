@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dal.Question.Models;
 using Dal.Question.Repositories.Interfaces;
@@ -15,10 +16,10 @@ public class QuestionManager : IQuestionManager
         _repository = repository;
     }
     
-    public async Task<List<QuestionDal>> GetRandomQuestionsAsync(int count)
+    public async Task<List<QuestionDal>> GetRandomQuestionsAsync(int count, Guid topicId)
     {
         var transaction = _repository.BeginTransaction();
-        var dalList = await _repository.GetRandomQuestionListAsync(count, transaction);
+        var dalList = await _repository.GetRandomQuestionListAsync(count, topicId, transaction);
         return dalList;
     }
 }
