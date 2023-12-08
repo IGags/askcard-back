@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 using Core.RepositoryBase.Connection.Interfaces;
 using Core.Settings.Models;
 using Microsoft.Extensions.Options;
@@ -10,6 +11,8 @@ namespace Core.RepositoryBase.Connection;
 public class DbConnectionFactory : IDbConnectionFactory
 {
     private DbConnection _connection;
+
+    private DbTransaction _transaction;
     
     private readonly DbSettings _dbSettings;
     
@@ -41,6 +44,26 @@ public class DbConnectionFactory : IDbConnectionFactory
         }
         
         return _connection.BeginTransaction();
+    }
+
+    public DbTransaction StartTransactionOrDefault()
+    {
+        if (_transaction != null)
+        {
+            try
+            {
+                var tr = _transaction.IsolationLevel;
+                return _transaction;
+            }
+            catch (Exception e)
+            {
+                _transaction = StartTransaction();
+                return _transaction;
+            }
+        }
+
+        _transaction = StartTransaction();
+        return _transaction;
     }
 
     public void Dispose()

@@ -17,6 +17,6 @@ public interface IDbConnectionFactory : IDisposable
     /// Начать транзакцию
     /// </summary>
     DbTransaction StartTransaction();
-    
-    
+
+    DbTransaction StartTransactionOrDefault();
 }

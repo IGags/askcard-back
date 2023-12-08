@@ -24,7 +24,7 @@ public class Repository<TDal, TKey> : IRepository<TDal, TKey> where TDal : DalMo
     /// <inheritdoc />
     public DbTransaction BeginTransaction()
     {
-        return Connection.BeginTransaction();
+        return _connectionFactory.StartTransactionOrDefault();
     }
 
     /// <inheritdoc />

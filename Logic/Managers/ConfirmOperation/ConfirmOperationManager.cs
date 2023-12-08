@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Common;
 using System.Threading.Tasks;
 using Core.Helpers;
 using Core.Settings.Models;
@@ -25,10 +26,8 @@ public class ConfirmOperationManager : IConfirmOperationManager
         _options = options;
     }
     
-    public async Task<ConfirmOperationCreateResultModel> CreateOperationAsync<TData>(ConfirmOperationModel<TData> model) where TData : class
+    public async Task<ConfirmOperationCreateResultModel> CreateOperationAsync<TData>(ConfirmOperationModel<TData> model, DbTransaction transaction = null) where TData : class
     {
-        var transaction = _operationRepository.BeginTransaction();
-
         var code = SecretCodeGenerationHelper.GenerateCode(model.CodeLength ?? 6);
         
         var operationModel = new UserOperationDal()
@@ -44,8 +43,6 @@ public class ConfirmOperationManager : IConfirmOperationManager
         
         var id = await _operationRepository.InsertAsync(operationModel, transaction);
 
-        await transaction.CommitAsync();
-
         var response = new ConfirmOperationCreateResultModel()
         {
             Code = code,
@@ -55,9 +52,8 @@ public class ConfirmOperationManager : IConfirmOperationManager
         return response;
     }
 
-    public async Task<TData> ConfirmOperationAsync<TData>(Guid operationId, string operationName, string code) where TData : class
+    public async Task<TData> ConfirmOperationAsync<TData>(Guid operationId, string operationName, string code, DbTransaction transaction = null) where TData : class
     {
-        var transaction = _operationRepository.BeginTransaction();
         UserOperationDal dal;
         try
         {
@@ -99,7 +95,6 @@ public class ConfirmOperationManager : IConfirmOperationManager
         var result = dal.CustomData.ToObject<TData>();
 
         await _operationRepository.DeleteAsync(operationId, transaction);
-        await transaction.CommitAsync();
 
         return result;
     }
