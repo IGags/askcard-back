@@ -64,7 +64,7 @@ public class AuthenticationManager : IAuthenticationManager
         claims.Add(new("username", user.Email));
         claims.Add(new("displayName", user.Name));
         claims.Add(new(ClaimTypes.Role, user.Role));
-        claims.Add(new(JwtRegisteredClaimNames.Sub, user.Name));
+        claims.Add(new(JwtRegisteredClaimNames.Sub, user.Id.ToString()));
         claims.Add(new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Value.SigningKey));
