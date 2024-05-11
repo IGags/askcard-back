@@ -18,7 +18,7 @@ public class Program
         var hostBuilder = Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(x =>
         {
             x.UseStartup<Startup>();
-            x.ConfigureKestrel(y => y.Listen(IPAddress.Parse("26.231.63.180"), 5111));
+            //x.ConfigureKestrel(y => y.Listen(IPAddress.Parse("26.231.63.180"), 5111));
         });
         var host = hostBuilder.Build();
         await host.RunOneTimeLogicAsync();
