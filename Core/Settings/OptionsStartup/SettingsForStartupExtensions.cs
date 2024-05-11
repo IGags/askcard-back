@@ -11,7 +11,7 @@ namespace Core.Settings.OptionsStartup;
 
 public static class SettingsForStartupExtensions
 {
-    public static IServiceCollection AddSettings<T>(this IServiceCollection collection) where T : class, IValidateOptions<T>
+    public static IServiceCollection AddSettings<T>(this IServiceCollection collection) where T : class, IValidateOptions
     {
         collection.TryAddSingleton<IOptions<T>>(provider =>
         {
@@ -20,7 +20,14 @@ public static class SettingsForStartupExtensions
             var wrapper = new OptionsWrapper<T>(ctor);
             return wrapper;
         });
-
+        
+        collection.AddSingleton<IValidateOptions>(sp =>
+        {
+            var configuration = sp.GetRequiredService<IConfiguration>();
+            var ctor = (T)Activator.CreateInstance(typeof(T), configuration);
+            return ctor;
+        });
+        
         return collection;
     }
 }

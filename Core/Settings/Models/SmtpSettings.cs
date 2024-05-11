@@ -8,7 +8,7 @@ namespace Core.Settings.Models;
 /// <summary>
 /// Настройки отправки сообщений
 /// </summary>
-public class SmtpSettings : IValidateOptions<SmtpSettings>
+public class SmtpSettings : IValidateOptions
 {
     private const string SectionName = "SmtpSettings";
     private const string FromMailAddress = "FromMailAddress";
@@ -52,7 +52,7 @@ public class SmtpSettings : IValidateOptions<SmtpSettings>
     
     public bool SslEnable { get; }
     
-    public ValidateOptionsResult Validate(string name, SmtpSettings options)
+    public void Validate()
     {
         var failureMessages = new List<string>();
         
@@ -83,9 +83,7 @@ public class SmtpSettings : IValidateOptions<SmtpSettings>
         
         if (failureMessages.Any())
         {
-            throw new OptionsValidationException(name, typeof(SmtpSettings), failureMessages);
+            throw new OptionsValidationException(nameof(SmtpSettings), typeof(SmtpSettings), failureMessages);
         }
-
-        return new ValidateOptionsResult();
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace Core.Settings.Models;
 
-public class IdentitySettings : IValidateOptions<IdentitySettings>
+public class IdentitySettings : IValidateOptions
 {
     private const string SectionName = "IdentitySettings";
     private const string IssuerName = "Issuer";
@@ -32,7 +32,7 @@ public class IdentitySettings : IValidateOptions<IdentitySettings>
     
     public int TokenLifetime { get; }
     
-    public ValidateOptionsResult Validate(string name, IdentitySettings options)
+    public void Validate()
     {
         var errorList = new List<string>();
         if (string.IsNullOrWhiteSpace(Issuer))
@@ -54,9 +54,7 @@ public class IdentitySettings : IValidateOptions<IdentitySettings>
 
         if (errorList.Any())
         {
-            throw new OptionsValidationException(name, typeof(IdentitySettings), errorList);
+            throw new OptionsValidationException(nameof(IdentitySettings), typeof(IdentitySettings), errorList);
         }
-
-        return new ValidateOptionsResult();
     }
 }

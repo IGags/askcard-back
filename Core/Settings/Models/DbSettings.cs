@@ -8,7 +8,7 @@ namespace Core.Settings.Models;
 /// <summary>
 /// Настройки из базы
 /// </summary>
-public class DbSettings : IValidateOptions<DbSettings>
+public class DbSettings : IValidateOptions
 {
     private const string SectionName = "DatabaseSettings";
     private const string ConnectionStringName = "ConnectionString";
@@ -25,7 +25,7 @@ public class DbSettings : IValidateOptions<DbSettings>
     /// </summary>
     public string ConnectionString { get; }
 
-    public ValidateOptionsResult Validate(string name, DbSettings options)
+    public void Validate()
     {
         var failureMessages = new List<string>();
 
@@ -36,9 +36,7 @@ public class DbSettings : IValidateOptions<DbSettings>
 
         if (failureMessages.Any())
         {
-            throw new OptionsValidationException(name, typeof(DbSettings), failureMessages);
+            throw new OptionsValidationException(nameof(DbSettings), typeof(DbSettings), failureMessages);
         }
-
-        return new ValidateOptionsResult();
     }
 }

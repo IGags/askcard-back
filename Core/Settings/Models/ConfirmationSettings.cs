@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace Core.Settings.Models;
 
-public class ConfirmationSettings : IValidateOptions<ConfirmationSettings>
+public class ConfirmationSettings : IValidateOptions
 {
     private const string SectionName = "ConfirmationSettings";
 
@@ -28,7 +28,7 @@ public class ConfirmationSettings : IValidateOptions<ConfirmationSettings>
     
     public int AttemptCount { get; }
     
-    public ValidateOptionsResult Validate(string name, ConfirmationSettings options)
+    public void Validate()
     {
         var failureMessages = new List<string>();
         if (ExpirationTime == int.MinValue)
@@ -43,9 +43,7 @@ public class ConfirmationSettings : IValidateOptions<ConfirmationSettings>
 
         if (failureMessages.Any())
         {
-            throw new OptionsValidationException(name, typeof(ConfirmationSettings), failureMessages);
+            throw new OptionsValidationException(nameof(ConfirmationSettings), typeof(ConfirmationSettings), failureMessages);
         }
-
-        return new ValidateOptionsResult();
     }
 }

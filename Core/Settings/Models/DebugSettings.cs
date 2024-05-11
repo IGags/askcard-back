@@ -6,7 +6,7 @@ namespace Core.Settings.Models;
 /// <summary>
 /// Настройки дебаг мода(для деплоя)
 /// </summary>
-public class DebugSettings : IValidateOptions<DebugSettings>
+public class DebugSettings : IValidateOptions
 {
     private const string KeyName = "IsDebug";
     
@@ -21,8 +21,7 @@ public class DebugSettings : IValidateOptions<DebugSettings>
         IsDebug = autoCreate;
     }
 
-    public ValidateOptionsResult Validate(string name, DebugSettings options)
+    public void Validate()
     {
-        return new ValidateOptionsResult();
     }
 }
