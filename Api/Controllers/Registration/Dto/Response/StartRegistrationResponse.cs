@@ -10,5 +10,5 @@ public class StartRegistrationResponse
     /// <summary>
     /// Идентификатор операции
     /// </summary>
-    public Guid OperationId { get; set; }
+    public string OperationId { get; set; }
 }

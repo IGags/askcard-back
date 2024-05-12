@@ -3,46 +3,43 @@ using System.Data.Common;
 using System.Threading.Tasks;
 using Core.Helpers;
 using Core.Settings.Models;
-using Dal.User;
-using Dal.UserOperation;
-using Dal.UserOperation.Interfaces;
 using Logic.Exceptions;
 using Logic.Managers.ConfirmOperation.Interfaces;
 using Logic.Managers.ConfirmOperation.Models;
 using Logic.Managers.Registration;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using StackExchange.Redis;
 
 namespace Logic.Managers.ConfirmOperation;
 
 public class ConfirmOperationManager : IConfirmOperationManager
 {
-    private readonly IUserOperationRepository _operationRepository;
+    private readonly IDatabase _database;
     private readonly IOptions<ConfirmationSettings> _options;
 
-    public ConfirmOperationManager(IUserOperationRepository operationRepository, IOptions<ConfirmationSettings> options)
+    public ConfirmOperationManager(IDatabase database, IOptions<ConfirmationSettings> options)
     {
-        _operationRepository = operationRepository;
+        _database = database;
         _options = options;
     }
     
-    public async Task<ConfirmOperationCreateResultModel> CreateOperationAsync<TData>(ConfirmOperationModel<TData> model, DbTransaction transaction = null) where TData : class
+    public async Task<ConfirmOperationCreateResultModel> CreateOperationAsync<TData>(string operationName, TData customData, Guid userId,
+        int? codeLength = null, int? attemptCount = null, TimeSpan? operationLifetime = null) where TData : class
     {
-        var code = SecretCodeGenerationHelper.GenerateCode(model.CodeLength ?? 6);
-        
-        var operationModel = new UserOperationDal()
+        var code = SecretCodeGenerationHelper.GenerateCode(codeLength ?? 6);
+        var model = new ConfirmOperationModel<TData>()
         {
+            AttemptCount = attemptCount ?? _options.Value.AttemptCount,
             Code = code,
-            CustomData = JObject.FromObject(model.CustomData),
-            ExpirationDate = DateTime.UtcNow 
-                             + (model.OperationLifetime ?? TimeSpan.FromSeconds(_options.Value.ExpirationTime)),
-            LeftAttempts = model.AttemptCount ?? _options.Value.AttemptCount,
-            OperationName = model.OperationName,
-            UserId = model.UserId
+            CustomData = customData,
+            UserId = userId
         };
         
-        var id = await _operationRepository.InsertAsync(operationModel, transaction);
-
+        var id = $"{operationName}-{Guid.NewGuid()}";
+        await _database.StringSetAsync(new RedisKey(id), new RedisValue(JsonConvert.SerializeObject(model)),
+            operationLifetime ?? TimeSpan.FromSeconds(_options.Value.ExpirationTime));
         var response = new ConfirmOperationCreateResultModel()
         {
             Code = code,
@@ -52,49 +49,38 @@ public class ConfirmOperationManager : IConfirmOperationManager
         return response;
     }
 
-    public async Task<TData> ConfirmOperationAsync<TData>(Guid operationId, string operationName, string code, DbTransaction transaction = null) where TData : class
+    public async Task<TData> ConfirmOperationAsync<TData>(string operationId, string code, Guid userId) where TData : class
     {
-        UserOperationDal dal;
-        try
-        {
-            dal = await _operationRepository.GetAsync(operationId, transaction);
-        }
-        catch (Exception)
+        var modelString = _database.StringGet(operationId);
+        if (modelString.IsNullOrEmpty)
         {
             throw new OperationNotFoundException(operationId);
         }
 
-        if (!dal.OperationName.Equals(Constants.RegistrationOperationName))
+        var operation = JsonConvert.DeserializeObject<ConfirmOperationModel<TData>>(modelString);
+
+        if (operation.AttemptCount <= 0)
         {
-            await transaction.CommitAsync();
+            await _database.KeyDeleteAsync(operationId);
+            throw new IncorrectCodeException(operation.AttemptCount);
+        }
+
+        if (operation.UserId != userId)
+        {
             throw new OperationNotFoundException(operationId);
         }
         
-        if (dal.ExpirationDate < DateTime.UtcNow)
+        if (!operation.Code.Equals(code))
         {
-            await _operationRepository.DeleteAsync(operationId, transaction);
-            await transaction.CommitAsync();
-            throw new OperationIsExpiredException();
+            operation.AttemptCount--;
+            await _database.StringSetAsync(new RedisKey(operationId),
+                new RedisValue(JsonConvert.SerializeObject(operation)), keepTtl: true);
+            throw new IncorrectCodeException(operation.AttemptCount);
         }
 
-        if (dal.LeftAttempts <= 0)
-        {
-            await _operationRepository.DeleteAsync(operationId, transaction);
-            await transaction.CommitAsync();
-            throw new IncorrectCodeException(dal.LeftAttempts);
-        }
-        
-        if (!dal.Code.Equals(code))
-        {
-            dal.LeftAttempts--;
-            await _operationRepository.UpdateAsync(dal, transaction);
-            await transaction.CommitAsync();
-            throw new IncorrectCodeException(dal.LeftAttempts);
-        }
+        var result = operation.CustomData;
 
-        var result = dal.CustomData.ToObject<TData>();
-
-        await _operationRepository.DeleteAsync(operationId, transaction);
+        await _database.KeyDeleteAsync(operationId);
 
         return result;
     }

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Data;
 using Core.Migrations;
-using Dal.User;
-using Dal.UserOperation;
 using FluentMigrator;
 
 namespace Dal.Migrations.UserOperation;
@@ -15,17 +12,17 @@ public class Date_202310012310_AddUserOperation : Migration
 {
     public override void Up()
     {
-        var tbName = nameof(UserOperationDal).ToLower();
+        var tbName = "UserOperationDal".ToLower();
         if (!Schema.Table(tbName).Exists())
         {
             Create.Table(tbName)
-                .WithColumn(nameof(UserOperationDal.Id)).AsPrimaryGuid()
-                .WithColumn(nameof(UserOperationDal.CustomData)).AsString().Nullable()
-                .WithColumn(nameof(UserOperationDal.UserId)).AsGuid()
-                .WithColumn(nameof(UserOperationDal.OperationName)).AsString().NotNullable()
-                .WithColumn(nameof(UserOperationDal.Code)).AsString().NotNullable()
-                .WithColumn(nameof(UserOperationDal.ExpirationDate)).AsDateTimeOffset().Nullable()
-                .WithColumn(nameof(UserOperationDal.LeftAttempts)).AsInt32().NotNullable();
+                .WithColumn("Id").AsPrimaryGuid()
+                .WithColumn("CustomData").AsString().Nullable()
+                .WithColumn("UserId").AsGuid()
+                .WithColumn("OperationName").AsString().NotNullable()
+                .WithColumn("Code").AsString().NotNullable()
+                .WithColumn("ExpirationDate").AsDateTimeOffset().Nullable()
+                .WithColumn("LeftAttempts").AsInt32().NotNullable();
         }
     }
 

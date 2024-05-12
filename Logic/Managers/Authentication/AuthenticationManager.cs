@@ -41,7 +41,8 @@ public class AuthenticationManager : IAuthenticationManager
         try
         {
             var transaction = _userRepository.BeginTransaction();
-            var dalResult = await _userRepository.GetByFieldAsync(nameof(UserDal.Email), model.Email, transaction);
+            //TODO: плохо, что емейл приводится явно к нижнему регистру
+            var dalResult = await _userRepository.GetByFieldAsync(nameof(UserDal.Email), model.Email.ToLower(), transaction);
             userDal = dalResult.Single();
         }
         catch (Exception)

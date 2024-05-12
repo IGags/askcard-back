@@ -5,7 +5,7 @@ namespace Logic.Exceptions;
 
 public class OperationNotFoundException : BaseErrorCodeException
 {
-    public OperationNotFoundException(Guid operationId) 
+    public OperationNotFoundException(string operationId) 
         : base($"Операция с идетификатором {operationId} не найдена")
     {
         

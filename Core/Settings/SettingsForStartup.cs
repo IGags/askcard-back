@@ -16,6 +16,7 @@ public static class SettingsForStartup
         collection.AddSettings<SmtpSettings>();
         collection.AddSettings<ConfirmationSettings>();
         collection.AddSettings<IdentitySettings>();
+        collection.AddSettings<CacheSettings>();
         
         return collection;
     }

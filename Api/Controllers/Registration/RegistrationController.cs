@@ -51,7 +51,7 @@ public class RegistrationController : Controller
         var model = new ConfirmUserModel()
         {
             Code = request.Code,
-            OperationId = request.OperationId.Value
+            OperationId = request.OperationId
         };
 
         await _registrationManager.ConfirmRegistration(model);

@@ -5,7 +5,7 @@ namespace Logic.Managers.Registration.Interfaces;
 
 public interface IRegistrationManager
 {
-    public Task<Guid> StartRegistration(CreateUserModel model);
+    public Task<string> StartRegistration(CreateUserModel model);
     
     public Task ConfirmRegistration(ConfirmUserModel model);
 }

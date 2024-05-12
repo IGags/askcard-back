@@ -1,12 +1,11 @@
 ﻿using System;
+using Core.DbCustomTypes;
 
 namespace Logic.Managers.PasswordRestore.Models;
 
 public class RestorePasswordModel
 {
-    public Guid UserId { get; set; }
+    public NormalizedString Email { get; set; }
     
     public string NewPassword { get; set; }
-    
-    public string Code { get; set; }
 }

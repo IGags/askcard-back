@@ -7,7 +7,8 @@ namespace Logic.Managers.ConfirmOperation.Interfaces;
 
 public interface IConfirmOperationManager
 {
-    public Task<ConfirmOperationCreateResultModel> CreateOperationAsync<TData>(ConfirmOperationModel<TData> model, DbTransaction transaction = null) where TData : class;
+    public Task<ConfirmOperationCreateResultModel> CreateOperationAsync<TData>(string operationName, TData customData, Guid userId,
+        int? codeLength = null, int? attemptCount = null, TimeSpan? operationLifetime = null) where TData : class;
 
-    public Task<TData> ConfirmOperationAsync<TData>(Guid operationId, string operationName, string code, DbTransaction transaction = null) where TData : class;
+    public Task<TData> ConfirmOperationAsync<TData>(string operationId, string code, Guid userId) where TData : class;
 }

@@ -1,4 +1,5 @@
 using System.Text;
+using Core.Caching;
 using Core.Migrations;
 using Core.RepositoryBase.Connection;
 using Core.RepositoryBase.Connection.Interfaces;
@@ -8,6 +9,7 @@ using Core.Smtp.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -55,8 +57,13 @@ public static class CoreForStartup
         collection.AddCoreSettings();
 
         collection.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
+        collection.AddCache();
         collection.AddTransient<ISmtpSender, SmtpSender>();
         collection.AddMigrationRunner(configuration);
+        collection.AddLogging(x =>
+        {
+            x.AddConsole();
+        });
 
         var section = configuration.GetSection("IdentitySettings");
         collection.AddAuthentication(options =>

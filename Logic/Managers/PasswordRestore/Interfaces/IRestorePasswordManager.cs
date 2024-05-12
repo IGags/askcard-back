@@ -5,5 +5,7 @@ namespace Logic.Managers.PasswordRestore.Interfaces;
 
 public interface IRestorePasswordManager
 {
-    public Task StartRestorePassword(RestorePasswordModel model);
+    public Task<string> StartRestorePassword(RestorePasswordModel model);
+
+    public Task CompleteRestorePassword(string operationName, string code);
 }

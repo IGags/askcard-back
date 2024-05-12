@@ -6,8 +6,6 @@ using Core.Settings.Models;
 using Core.Smtp.Interfaces;
 using Dal.User;
 using Dal.User.Interfaces;
-using Dal.UserOperation;
-using Dal.UserOperation.Interfaces;
 using Logic.Exceptions;
 using Logic.Managers.ConfirmOperation.Interfaces;
 using Logic.Managers.ConfirmOperation.Models;
@@ -31,25 +29,19 @@ internal class RegistrationManager : IRegistrationManager
         _confirmOperationManager = confirmOperationManager;
     }
     
-    public async Task<Guid> StartRegistration(CreateUserModel model)
+    public async Task<string> StartRegistration(CreateUserModel model)
     {
         var transaction = _userRepository.BeginTransaction();
-        var isExist = await _userRepository.UserExistsByEmail(model.Email, transaction);
+        var isExist = await _userRepository.UserExistsByEmail(model.Email.ToLower(), transaction);
         if (isExist)
         {
             throw new UserAlreadyExistsException();
         }
         
         model = model with { Password = PasswordHashHelper.GetPasswordHash(model.Password) };
+        
 
-        var confirmModel = new ConfirmOperationModel<CreateUserModel>()
-        {
-            CustomData = model,
-            OperationName = Constants.RegistrationOperationName,
-            UserId = Guid.Empty
-        };
-
-        var resultModel = await _confirmOperationManager.CreateOperationAsync(confirmModel);
+        var resultModel = await _confirmOperationManager.CreateOperationAsync(Constants.RegistrationOperationName, model, Guid.Empty);
         
         await _sender.SendAsync(model.Email, "Ваш код регистрации", resultModel.Code);
        
@@ -60,8 +52,8 @@ internal class RegistrationManager : IRegistrationManager
 
     public async Task ConfirmRegistration(ConfirmUserModel model)
     {
-        var userModel = await _confirmOperationManager.ConfirmOperationAsync<CreateUserModel>(model.OperationId,
-            Constants.RegistrationOperationName, model.Code);
+        var userModel = await _confirmOperationManager.ConfirmOperationAsync<CreateUserModel>(model.OperationId, model.Code,
+            Guid.Empty);
 
         var userDal = new UserDal()
         {

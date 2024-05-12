@@ -15,6 +15,7 @@ services:
     image: igags/askcard:latest
     depends_on:
       - db
+      - cache
     networks:
       - services
     env_file:
@@ -24,5 +25,14 @@ services:
     expose:
       - 9094
     restart: always
+  
+  cache:
+    image: redis:latest
+    networks:
+      - services
+    ports:
+      - 6381:6379
+    expose:
+      - 6381
 networks:
   services:

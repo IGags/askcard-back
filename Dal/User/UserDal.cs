@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.DbCustomTypes;
 using Core.RepositoryBase.Model;
 
 namespace Dal.User;
@@ -21,7 +22,7 @@ public class UserDal : DalModelBase<Guid>
     /// <summary>
     /// Мыло пользователя
     /// </summary>
-    public required string Email { get; set; }
+    public required NormalizedString Email { get; set; }
     
     /// <summary>
     /// Согласен ли пользователь на рассылку
